@@ -36,9 +36,6 @@ class TryOnViewModel : ViewModel() {
     private val _wardrobeItems = MutableStateFlow<List<ClothingItem>>(emptyList())
     val wardrobeItems: StateFlow<List<ClothingItem>> = _wardrobeItems.asStateFlow()
 
-    private val _isARMode = MutableStateFlow(false)
-    val isARMode: StateFlow<Boolean> = _isARMode.asStateFlow()
-
     // Avatar face/body texture from camera or gallery
     private val _avatarTexture = MutableStateFlow<AvatarTexture?>(null)
     val avatarTexture: StateFlow<AvatarTexture?> = _avatarTexture.asStateFlow()
@@ -67,14 +64,6 @@ class TryOnViewModel : ViewModel() {
     fun setCategory(category: Category) {
         _activeCategory.value = category
         loadWardrobeItems()
-    }
-
-    fun toggleARMode() {
-        _isARMode.value = !_isARMode.value
-    }
-
-    fun setARMode(enabled: Boolean) {
-        _isARMode.value = enabled
     }
 
     // Image capture / selection

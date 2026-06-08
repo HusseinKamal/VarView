@@ -32,7 +32,7 @@ fun BodyProfilePanel(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(300.dp),
+            .height(220.dp),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White.copy(alpha = 0.95f)

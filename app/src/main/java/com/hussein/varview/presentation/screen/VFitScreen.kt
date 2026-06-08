@@ -3,10 +3,10 @@ package com.hussein.varview.presentation.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
@@ -31,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -79,7 +78,6 @@ fun VFitScreen(viewModel: TryOnViewModel = viewModel()) {
                     )
                 },
                 actions = {
-                    // Add photo button in top bar
                     IconButton(onClick = { viewModel.showImagePicker() }) {
                         Icon(
                             imageVector = Icons.Default.AddAPhoto,
@@ -116,27 +114,28 @@ fun VFitScreen(viewModel: TryOnViewModel = viewModel()) {
             }
         }
     ) { padding ->
-        Box(
+        // Vertical layout: Avatar on top, panel at bottom
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // 3D Avatar with selected clothing (full screen background)
+            // Top section: 3D Avatar (fills space between topbar and panel)
             AvatarRenderer(
                 selectedItems = selectedItems,
                 dimensions = dimensions,
                 avatarTexture = avatarTexture,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             )
 
-            // Overlay UI at bottom
-            Column(
-                modifier = Modifier.align(Alignment.BottomCenter)
-            ) {
-                // Tab switcher between Wardrobe and Body Profile
+            // Bottom section: Tabs + Panel (fixed height)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Tab switcher
                 TabRow(
                     selectedTabIndex = activeTab,
-                    containerColor = Color.White.copy(alpha = 0.9f),
+                    containerColor = Color.White.copy(alpha = 0.95f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Tab(
@@ -151,7 +150,7 @@ fun VFitScreen(viewModel: TryOnViewModel = viewModel()) {
                     )
                 }
 
-                // Animated panel content
+                // Panel content
                 AnimatedVisibility(
                     visible = activeTab == 0,
                     enter = slideInVertically(initialOffsetY = { it }),
