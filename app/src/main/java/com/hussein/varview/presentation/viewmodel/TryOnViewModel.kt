@@ -1,11 +1,14 @@
 package com.hussein.varview.presentation.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.hussein.varview.data.repository.AvatarRepositoryImpl
 import com.hussein.varview.data.repository.WardrobeRepositoryImpl
 import com.hussein.varview.domain.model.AvatarDimensions
+import com.hussein.varview.domain.model.AvatarTexture
 import com.hussein.varview.domain.model.Category
 import com.hussein.varview.domain.model.ClothingItem
+import com.hussein.varview.domain.model.TextureTarget
 import com.hussein.varview.domain.repository.WardrobeRepository
 import com.hussein.varview.domain.usecase.GetWardrobeItemsUseCase
 import com.hussein.varview.domain.usecase.UpdateAvatarDimensionsUseCase
@@ -36,6 +39,14 @@ class TryOnViewModel : ViewModel() {
     private val _isARMode = MutableStateFlow(false)
     val isARMode: StateFlow<Boolean> = _isARMode.asStateFlow()
 
+    // Avatar face/body texture from camera or gallery
+    private val _avatarTexture = MutableStateFlow<AvatarTexture?>(null)
+    val avatarTexture: StateFlow<AvatarTexture?> = _avatarTexture.asStateFlow()
+
+    // Controls whether the image picker dialog is shown
+    private val _showImagePicker = MutableStateFlow(false)
+    val showImagePicker: StateFlow<Boolean> = _showImagePicker.asStateFlow()
+
     init {
         loadWardrobeItems()
     }
@@ -64,6 +75,24 @@ class TryOnViewModel : ViewModel() {
 
     fun setARMode(enabled: Boolean) {
         _isARMode.value = enabled
+    }
+
+    // Image capture / selection
+    fun showImagePicker() {
+        _showImagePicker.value = true
+    }
+
+    fun dismissImagePicker() {
+        _showImagePicker.value = false
+    }
+
+    fun setAvatarImage(uri: Uri, target: TextureTarget = TextureTarget.FACE) {
+        _avatarTexture.value = AvatarTexture(uri = uri, target = target)
+        _showImagePicker.value = false
+    }
+
+    fun clearAvatarImage() {
+        _avatarTexture.value = null
     }
 
     private fun loadWardrobeItems() {

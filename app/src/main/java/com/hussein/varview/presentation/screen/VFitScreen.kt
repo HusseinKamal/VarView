@@ -5,21 +5,17 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Checkroom
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ViewInAr
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -41,9 +37,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hussein.varview.domain.model.TextureTarget
 import com.hussein.varview.presentation.components.AvatarRenderer
 import com.hussein.varview.presentation.components.BodyProfilePanel
-import com.hussein.varview.presentation.components.FullARView
+import com.hussein.varview.presentation.components.ImagePickerDialog
 import com.hussein.varview.presentation.components.WardrobePanel
 import com.hussein.varview.presentation.viewmodel.TryOnViewModel
 
@@ -54,21 +51,22 @@ fun VFitScreen(viewModel: TryOnViewModel = viewModel()) {
     val dimensions by viewModel.avatarDimensions.collectAsState()
     val activeCategory by viewModel.activeCategory.collectAsState()
     val wardrobeItems by viewModel.wardrobeItems.collectAsState()
-    val isARMode by viewModel.isARMode.collectAsState()
+    val avatarTexture by viewModel.avatarTexture.collectAsState()
+    val showImagePicker by viewModel.showImagePicker.collectAsState()
 
     // Panel tab: 0 = Wardrobe, 1 = Body Profile
     var activeTab by remember { mutableIntStateOf(0) }
     // Bottom nav selection
     var bottomNavIndex by remember { mutableIntStateOf(0) }
 
-    // Full AR mode
-    if (isARMode) {
-        FullARView(
-            selectedItems = selectedItems,
-            dimensions = dimensions,
-            onDismiss = { viewModel.setARMode(false) }
+    // Image picker dialog
+    if (showImagePicker) {
+        ImagePickerDialog(
+            onImageSelected = { uri ->
+                viewModel.setAvatarImage(uri, TextureTarget.FACE)
+            },
+            onDismiss = { viewModel.dismissImagePicker() }
         )
-        return
     }
 
     Scaffold(
@@ -79,6 +77,15 @@ fun VFitScreen(viewModel: TryOnViewModel = viewModel()) {
                         text = "VFit",
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    // Add photo button in top bar
+                    IconButton(onClick = { viewModel.showImagePicker() }) {
+                        Icon(
+                            imageVector = Icons.Default.AddAPhoto,
+                            contentDescription = "Add photo to avatar"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
@@ -106,15 +113,6 @@ fun VFitScreen(viewModel: TryOnViewModel = viewModel()) {
                     selected = bottomNavIndex == 2,
                     onClick = { bottomNavIndex = 2 }
                 )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.CameraAlt, contentDescription = "AR") },
-                    label = { Text("AR") },
-                    selected = bottomNavIndex == 3,
-                    onClick = {
-                        bottomNavIndex = 3
-                        viewModel.setARMode(true)
-                    }
-                )
             }
         }
     ) { padding ->
@@ -123,37 +121,18 @@ fun VFitScreen(viewModel: TryOnViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // 1. 3D Avatar Rendering (Background)
+            // 3D Avatar with selected clothing (full screen background)
             AvatarRenderer(
                 selectedItems = selectedItems,
                 dimensions = dimensions,
+                avatarTexture = avatarTexture,
                 modifier = Modifier.fillMaxSize()
             )
 
-            // 2. Overlay UI at bottom
+            // Overlay UI at bottom
             Column(
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                // Full AR View button
-                Button(
-                    onClick = { viewModel.setARMode(true) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ViewInAr,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text("Full AR View")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 // Tab switcher between Wardrobe and Body Profile
                 TabRow(
                     selectedTabIndex = activeTab,

@@ -59,9 +59,8 @@ dependencies {
     // ViewModel Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // 3D / AR SceneView
+    // 3D SceneView (Filament engine)
     implementation(libs.sceneview)
-    implementation(libs.arsceneview)
 
     // Testing
     testImplementation(libs.junit)

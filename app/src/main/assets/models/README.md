@@ -1,26 +1,48 @@
 # 3D Model Assets
 
-Place your `.glb` or `.gltf` model files here.
+Place your `.glb` model files here. The app loads them from this directory.
 
-## Required Files
+## Required: Default Avatar
 
-### Avatar
-- `avatar.glb` — The base humanoid avatar with a proper skeleton (armature)
-  - Must have named bones: Spine, Chest, Shoulder_L, Shoulder_R, Hips, etc.
-  - Optional: Include morph targets (blend shapes) for "Heavy", "Tall", "Slim" presets.
+**File:** `avatar.glb`
 
-### Clothing Items
-- `shirt_white.glb`
-- `shirt_blue.glb`
-- `tshirt_black.glb`
-- `tshirt_red.glb`
-- `jeans_dark.glb`
-- `chinos_khaki.glb`
-- `jacket_leather.glb`
-- `hoodie_grey.glb`
+This is the main humanoid avatar displayed in the app. You need a rigged humanoid model.
 
-### Clothing Rigging Requirements
-- Clothing models should share the same skeleton as the avatar for proper skinning.
-- Alternatively, clothing can be "static" meshes parented to specific bones.
-- Upper body items (shirts, t-shirts, outerwear) attach to the Chest bone.
-- Lower body items (trousers) attach to the Hips bone.
+### Free options to download:
+
+1. **Ready Player Me** (https://readyplayer.me) — Create a free avatar, export as .glb
+2. **Mixamo** (https://www.mixamo.com) — Free characters from Adobe, export as FBX then convert to .glb
+3. **Sketchfab** (https://sketchfab.com/search?type=models&q=humanoid+avatar&licenses=322a749bcfa841bab4000e7b753f4da0) — Search for CC-licensed humanoid models
+4. **glTF Sample Models** (https://github.com/KhronosGroup/glTF-Sample-Models) — Test with CesiumMan or similar
+
+### Quick test with a sample model:
+Download from: https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/CesiumMan/glTF-Binary/CesiumMan.glb
+Rename to `avatar.glb` and place here.
+
+## Clothing Items
+
+Each clothing item is a separate .glb file placed on the avatar body:
+
+| File | Category | Description |
+|------|----------|-------------|
+| `shirt_white.glb` | SHIRTS | White dress shirt |
+| `shirt_blue.glb` | SHIRTS | Blue formal shirt |
+| `tshirt_black.glb` | T_SHIRTS | Black t-shirt |
+| `tshirt_red.glb` | T_SHIRTS | Red graphic tee |
+| `jeans_dark.glb` | TROUSERS | Dark denim jeans |
+| `chinos_khaki.glb` | TROUSERS | Khaki chinos |
+| `jacket_leather.glb` | OUTERWEAR | Leather jacket |
+| `hoodie_grey.glb` | OUTERWEAR | Grey hoodie |
+
+### Clothing Model Requirements
+
+- Models should be positioned at origin (0,0,0)
+- Upper body items (shirts/outerwear) center around chest height
+- Lower body items (trousers) center around hip height
+- For best results, clothing should share the same skeleton as the avatar
+- Alternatively, static meshes work — the app positions them by category
+
+## Environment (Optional)
+
+The `environments/` folder can hold HDR files for lighting.
+Without one, SceneView uses a default neutral environment.
