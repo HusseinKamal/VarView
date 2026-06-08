@@ -2,14 +2,26 @@ package com.hussein.varview.presentation.components
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.hussein.varview.domain.model.AvatarDimensions
 import com.hussein.varview.domain.model.AvatarTexture
 import com.hussein.varview.domain.model.Category
@@ -30,9 +42,8 @@ import io.github.sceneview.rememberModelInstance
 import io.github.sceneview.rememberModelLoader
 
 /**
- * 3D Avatar renderer — full body human avatar centered in view.
- * Dark gray background like a studio setting.
- * Avatar fits the full height of the section, scaled to unit = 1.
+ * 3D Avatar renderer with dimension indicators.
+ * Shows height, shoulder width, waist width as overlay labels.
  */
 @Composable
 fun AvatarRenderer(
@@ -45,7 +56,6 @@ fun AvatarRenderer(
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
 
-    // Camera pulled back to show full body on mobile screen
     val cameraManipulator = rememberCameraManipulator(
         orbitHomePosition = Position(0f, 0.45f, 3.5f),
         targetPosition = Position(0f, 0.45f, 0f)
@@ -76,8 +86,9 @@ fun AvatarRenderer(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF2D2D2D)) // Dark gray studio background
+            .background(Color(0xFF2D2D2D))
     ) {
+        // 3D Scene
         SceneView(
             modifier = Modifier.fillMaxSize(),
             engine = engine,
@@ -86,10 +97,8 @@ fun AvatarRenderer(
             environment = environment,
             mainLightNode = mainLightNode
         ) {
-            // Root node with body dimension scaling
             Node(scale = Scale(scaleX, scaleY, scaleZ)) {
 
-                // Avatar model — small scale suitable for mobile
                 rememberModelInstance(modelLoader, "models/avatar.glb")?.let { instance ->
                     ModelNode(
                         modelInstance = instance,
@@ -124,7 +133,7 @@ fun AvatarRenderer(
                     }
                 }
 
-                // Clothing items on the body
+                // Clothing items
                 selectedItems.values.forEach { item ->
                     rememberModelInstance(modelLoader, item.modelUrl)?.let { clothingInstance ->
                         Node(
@@ -144,5 +153,73 @@ fun AvatarRenderer(
                 }
             }
         }
+
+        // Height indicator (left side)
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxHeight()
+                .width(40.dp)
+                .padding(start = 8.dp, top = 24.dp, bottom = 24.dp)
+        ) {
+            // Vertical dashed line
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val dash = PathEffect.dashPathEffect(floatArrayOf(10f, 8f), 0f)
+                drawLine(
+                    color = Color(0xFF4FC3F7),
+                    start = Offset(size.width / 2, 0f),
+                    end = Offset(size.width / 2, size.height),
+                    strokeWidth = 2f,
+                    pathEffect = dash
+                )
+                // Top arrow
+                drawLine(Color(0xFF4FC3F7), Offset(size.width / 2 - 8, 12f), Offset(size.width / 2, 0f), 2f)
+                drawLine(Color(0xFF4FC3F7), Offset(size.width / 2 + 8, 12f), Offset(size.width / 2, 0f), 2f)
+                // Bottom arrow
+                drawLine(Color(0xFF4FC3F7), Offset(size.width / 2 - 8, size.height - 12), Offset(size.width / 2, size.height), 2f)
+                drawLine(Color(0xFF4FC3F7), Offset(size.width / 2 + 8, size.height - 12), Offset(size.width / 2, size.height), 2f)
+            }
+            // Height label
+            Text(
+                text = "%.0f cm".format(dimensions.height * 100),
+                color = Color(0xFF4FC3F7),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
+        // Dimension labels (right side)
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 8.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            DimensionLabel("Shoulders", "%.0f cm".format(dimensions.shoulderWidth * 100))
+            DimensionLabel("Chest", "%.0f cm".format(dimensions.chestWidth * 100))
+            DimensionLabel("Waist", "%.0f cm".format(dimensions.waistWidth * 100))
+            DimensionLabel("Hips", "%.0f cm".format(dimensions.hipWidth * 100))
+        }
+    }
+}
+
+@Composable
+private fun DimensionLabel(label: String, value: String) {
+    Column(
+        modifier = Modifier.padding(vertical = 4.dp),
+        horizontalAlignment = Alignment.End
+    ) {
+        Text(
+            text = label,
+            color = Color(0xFFBDBDBD),
+            fontSize = 9.sp
+        )
+        Text(
+            text = value,
+            color = Color.White,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
