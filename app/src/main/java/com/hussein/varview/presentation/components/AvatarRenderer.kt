@@ -45,10 +45,10 @@ fun AvatarRenderer(
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
 
-    // Camera pulled back so avatar appears at natural size, not oversized
+    // Camera pulled back to show full body on mobile screen
     val cameraManipulator = rememberCameraManipulator(
-        orbitHomePosition = Position(0f, 0.5f, 2.5f),
-        targetPosition = Position(0f, 0.5f, 0f)
+        orbitHomePosition = Position(0f, 0.45f, 3.5f),
+        targetPosition = Position(0f, 0.45f, 0f)
     )
     val environment = rememberEnvironment(engine)
     val mainLightNode = rememberMainLightNode(engine) {
@@ -89,11 +89,11 @@ fun AvatarRenderer(
             // Root node with body dimension scaling
             Node(scale = Scale(scaleX, scaleY, scaleZ)) {
 
-                // Avatar model — compact size, not filling entire view
+                // Avatar model — small scale suitable for mobile
                 rememberModelInstance(modelLoader, "models/avatar.glb")?.let { instance ->
                     ModelNode(
                         modelInstance = instance,
-                        scaleToUnits = 0.8f,
+                        scaleToUnits = 0.6f,
                         autoAnimate = true
                     )
                 }
